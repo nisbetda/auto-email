@@ -1,33 +1,42 @@
+from account import sender_email, password
+from bs4 import BeautifulSoup
 import pprint
 import requests
-from bs4 import BeautifulSoup
 import smtplib, ssl
 
+#Step 1:
 #Get headline from CNBC.com
 cnbc = 'https://www.cnbc.com/'
 response = requests.get(cnbc)
 soup = BeautifulSoup(response.text, "html.parser")
-print("HTML data is loading...")
 
 h2 = soup.find("h2")
-h8 = soup.find_all('td', class_="MarketTop-symbol")
-
 pprint.pprint(h2)
-pprint.pprint(h8)
 
-#send email
-sender_email = "daltonnisbett@gmail.com"
-receiver_email = "nisbetda@miamioh.edu"
-password = 'Hercules0810?'
-
+#Step 2:
+#Send email using Simple Mail Transfer Protocol (SMTP)
 port = 465  # For SSL
 smtp_server = "smtp.gmail.com"
-message = """\
-Subject: Hi there
+receiver_email = "nisbetda@miamioh.edu"
 
-This message is sent from Python."""
+#The email content
+subject = 'CNBC'
+body = h2.get_text()
+msg = f'Subject: {subject}\n\n{body}'
 
 context = ssl.create_default_context()
 with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
     server.login(sender_email, password)
-    server.sendmail(sender_email, receiver_email, message)
+    server.sendmail(sender_email, receiver_email, msg)
+
+#Step 3:
+#Automatically send every morning
+
+#Bugs: email wouldn't send because there is a security setting on gmail to allow outside apps to login
+
+#followed a youtube tutorial on web scrapping to get soccer standings
+#applied the same techniques to CNBC, something more useful and interesting to myself
+
+#followed a different tutorial on sending emails using smtplib
+
+#/Users/daltonnisbett/Documents/CODE/DSA/newsletter.py
